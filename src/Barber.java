@@ -36,12 +36,12 @@ public class Barber implements Runnable {
 				    gui.fillBarberChair(pos,customer);
 				    gui.barberIsAwake(pos);
 				    gui.println("Barber on position " +  String.valueOf(pos) + " got a customer.");
-				    int sleepTime = Globals.barberWork + (int) Math.random() * (Constants.MAX_BARBER_WORK - Constants.MIN_BARBER_WORK +1);
+                    int sleepTime = Globals.barberWork + (int) (Math.random() * (Constants.MAX_BARBER_WORK - Constants.MIN_BARBER_WORK +1));
 				    getSleep(sleepTime);
                     gui.emptyBarberChair(pos);
                 }
                 else{
-				    int sleepTime = Globals.barberSleep + (int) Math.random() * (Constants.MAX_BARBER_SLEEP - Constants.MIN_BARBER_SLEEP+1);
+				    int sleepTime = Globals.barberSleep + (int) (Math.random() * (Constants.MAX_BARBER_SLEEP - Constants.MIN_BARBER_SLEEP+1));
 				    gui.barberIsSleeping(pos);
 				    getSleep(sleepTime);
 				    gui.barberIsAwake(pos);
@@ -53,8 +53,8 @@ public class Barber implements Runnable {
 
     private void getSleep(int sleepTime){
  	    try {
-            Thread.sleep(sleepTime);
             gui.println("Barber on position" + String.valueOf(pos) + " is sleeping");
+            thread.sleep(sleepTime);
         }catch (InterruptedException e){
  	        System.err.println("Barber sleep interrupted");
         }
@@ -64,7 +64,7 @@ public class Barber implements Runnable {
 	 * Starts the barber running as a separate thread.
 	 */
 	public void startThread() {
-	    thread = new Thread();
+	    thread = new Thread(this);
 	    thread.start();
 
 	}

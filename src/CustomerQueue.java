@@ -23,7 +23,7 @@ public class CustomerQueue {
 		if(queue.size() >= queueLength){
 			throw new IllegalStateException("The queue is full");
 		}
-		gui.fillLoungeChair(queue.size()-1, customer);
+		gui.fillLoungeChair(queue.size(), customer);
 		queue.add(customer);
 	}
 
@@ -38,9 +38,10 @@ public class CustomerQueue {
 	public boolean hasCustomers(){
 	    return queue.size() > 0;
     }
-    public boolean isEmpty(){
-	    return queue.isEmpty();
+    public boolean isFull(){
+	    return queue.size() >= queueLength;
     }
+
 
 	// Add more methods as needed
 }

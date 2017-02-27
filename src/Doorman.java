@@ -1,3 +1,4 @@
+
 /**
  * This class implements the doorman's part of the
  * Barbershop thread synchronization example.
@@ -27,25 +28,36 @@ public class Doorman implements Runnable {
 	public void run(){
 		for(int i=0;i<500;i++){
 		    synchronized (this) {
-                if (customerQueue.isEmpty()) {
+                if (!customerQueue.isFull()) {
                     Customer customer = new Customer();
                     customerQueue.add(customer);
                     gui.println("Doorman filled a new chair");
                 } else {
                     gui.println("All chairs are full.");
                 }
+                takeSleep();
             }
         }
 	}
 
+    private void takeSleep() {
+	    int sleepTime = Globals.doormanSleep + (int) (Math.random() * (Constants.MAX_DOORMAN_SLEEP - Constants.MIN_DOORMAN_SLEEP +1));
+        try {
+            thread.sleep(sleepTime);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-	/**
+    }
+
+
+    /**
 	 * Starts the doorman running as a separate thread. Make
 	 * sure to create the thread and start it.
 	 */
 	public void startThread() {
 		// Incomplete
-        thread = new Thread();
+        thread = new Thread(this);
         thread.start();
 	}
 
