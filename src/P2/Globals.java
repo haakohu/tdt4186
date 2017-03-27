@@ -1,6 +1,8 @@
+package P2;
+
 /**
  * Class containing three globally available variables modified by the GUI
- * and used by the Barber and Doorman threads.
+ * and used by the P2.Barber and P2.Doorman threads.
  *
  * It should not be necessary to edit this class (but feel free to do so if you wish).
  */

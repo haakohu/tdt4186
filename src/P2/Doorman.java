@@ -1,3 +1,4 @@
+package P2;
 
 /**
  * This class implements the doorman's part of the
@@ -25,18 +26,13 @@ public class Doorman implements Runnable {
 	 * created for this instance.
 	 */
 	@Override
-	public void run(){
-		for(int i=0;i<500;i++){
-		    synchronized (this) {
-                if (!customerQueue.isFull()) {
-                    Customer customer = new Customer();
-                    customerQueue.add(customer);
-                    gui.println("Doorman filled a new chair");
-                } else {
-                    gui.println("All chairs are full.");
-                }
-                takeSleep();
-            }
+	public synchronized void run(){
+	    while(true) {
+            takeSleep();
+            Customer customer = new Customer();
+            customerQueue.add(customer);
+            gui.println("P2.Doorman was notified of a new customer!");
+            gui.println("All chairs are full.");
         }
 	}
 

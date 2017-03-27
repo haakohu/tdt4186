@@ -1,5 +1,7 @@
+package P2;
+
 /**
- * Constants used by the GUI.
+ * P2.Constants used by the GUI.
  *
  * It should not be necessary to edit this class (but feel free to do so if you wish).
  */
@@ -51,7 +53,7 @@ public abstract class Constants
 	/** The minimum number of milliseconds between each time a new customer arrives */
 	public final static int MIN_DOORMAN_SLEEP = 100;
 	/** The maximum number of milliseconds between each time a new customer arrives */
-	public final static int MAX_DOORMAN_SLEEP = 2000;
+	public final static int MAX_DOORMAN_SLEEP = 6000;
 
 	// Hides the constructor.
 	private Constants(){}

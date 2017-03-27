@@ -1,3 +1,5 @@
+package P2;
+
 /**
  * This class implements the barber's part of the
  * Barbershop thread synchronization example.
@@ -28,35 +30,23 @@ public class Barber implements Runnable {
 	 * created for this instance.
 	 */
 	@Override
- 	public void run(){
-		for(int i= 0; i<500; i++){
-			synchronized (this){
-				if(customerQueue.hasCustomers()){
-				    Customer customer = customerQueue.next();
-				    gui.fillBarberChair(pos,customer);
-				    gui.barberIsAwake(pos);
-				    gui.println("Barber on position " +  String.valueOf(pos) + " got a customer.");
-                    int sleepTime = Globals.barberWork + (int) (Math.random() * (Constants.MAX_BARBER_WORK - Constants.MIN_BARBER_WORK +1));
-				    getSleep(sleepTime);
-                    gui.emptyBarberChair(pos);
-                }
-                else{
-				    int sleepTime = Globals.barberSleep + (int) (Math.random() * (Constants.MAX_BARBER_SLEEP - Constants.MIN_BARBER_SLEEP+1));
-				    gui.barberIsSleeping(pos);
-				    getSleep(sleepTime);
-				    gui.barberIsAwake(pos);
-                }
-			}
-		}
-
+ 	public synchronized void run(){
+            Customer customer = customerQueue.next();
+            gui.fillBarberChair(pos, customer);
+            gui.barberIsAwake(pos);
+            gui.println("P2.Barber on position " + String.valueOf(pos) + " got a customer.");
+            int sleepTime = Globals.barberWork + (int) (Math.random() * (Constants.MAX_BARBER_WORK - Constants.MIN_BARBER_WORK + 1));
+            getSleep(sleepTime);
+            gui.emptyBarberChair(pos);
+            gui.println("P2.Barber #" + String.valueOf(pos) + " is waiting.");
+            gui.barberIsAwake(pos);
 	}
 
     private void getSleep(int sleepTime){
  	    try {
-            gui.println("Barber on position" + String.valueOf(pos) + " is sleeping");
             thread.sleep(sleepTime);
         }catch (InterruptedException e){
- 	        System.err.println("Barber sleep interrupted");
+ 	        System.err.println("P2.Barber sleep interrupted");
         }
     }
 

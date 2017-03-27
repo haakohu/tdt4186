@@ -1,3 +1,5 @@
+package P2;
+
 import java.awt.*;
 import javax.swing.*;
 
@@ -20,7 +22,7 @@ public class PicturePanel extends JPanel {
 	private int orientation;
 
 	/**
-	 * Creates a new PicturePanel displaying a given image.
+	 * Creates a new P2.PicturePanel displaying a given image.
 	 * @param image	The image to be displayed.
 	 */
 	public PicturePanel(Image image) {

@@ -1,3 +1,5 @@
+package P2;
+
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -13,26 +15,41 @@ public class CustomerQueue {
 	private int queueLength;
 	private Gui gui;
 	private Queue<Customer> queue = new LinkedList<>();
+	private int totalCount = 0;
 
 	public CustomerQueue(int queueLength, Gui gui) {
     	this.queueLength = queueLength;
     	this.gui = gui;
 	}
 
-	public void add(Customer customer) {
-		if(queue.size() >= queueLength){
-			throw new IllegalStateException("The queue is full");
-		}
-		gui.fillLoungeChair(queue.size(), customer);
-		queue.add(customer);
-	}
+	public synchronized void add(Customer customer) {
 
-	public Customer next() {
+		if(queue.size() >= queueLength){
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+		gui.fillLoungeChair(totalCount % 18, customer);
+		totalCount++;
+		queue.add(customer);
+		notifyAll();
+        System.out.println("Notified of a new customer!");
+    }
+
+	public synchronized Customer next() {
 		if(queue.isEmpty()){
-			throw new IllegalStateException("The queue is empty");
-		}
-		gui.emptyLoungeChair(queue.size()-1);
-		return queue.remove();
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+		Customer customer  = queue.remove();
+        gui.emptyLoungeChair(totalCount%18 -1);
+		//notifyAll();
+		return customer;
 	}
 
 	public boolean hasCustomers(){

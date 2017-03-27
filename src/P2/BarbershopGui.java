@@ -1,3 +1,5 @@
+package P2;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -5,8 +7,8 @@ import javax.swing.event.*;
 
 /**
  * This class displays a GUI for the Barbershop example, and also contains the
- * startup method. It implements the Gui interface containing methods publicly
- * available to be used by the Doorman, Barber and CustomerQueue classes.
+ * startup method. It implements the P2.Gui interface containing methods publicly
+ * available to be used by the P2.Doorman, P2.Barber and P2.CustomerQueue classes.
  *
  * It should not be necessary to edit this class (but feel free to do so if you wish).
  */
@@ -137,11 +139,11 @@ public class BarbershopGui extends JFrame implements Gui, ChangeListener {
         controlPanel.add(barberSleepSlider);
         controlPanel.add(barberWorkSlider);
         controlPanel.add(display);
-        addSliderLabels(controlPanel,10,10,280,20,Constants.MIN_DOORMAN_SLEEP,Constants.MAX_DOORMAN_SLEEP,"Doorman sleep time");
+        addSliderLabels(controlPanel,10,10,280,20,Constants.MIN_DOORMAN_SLEEP,Constants.MAX_DOORMAN_SLEEP,"P2.Doorman sleep time");
         doormanSleepSlider.setBounds(10,30,280,20);
-        addSliderLabels(controlPanel,10,50,280,20,Constants.MIN_BARBER_SLEEP,Constants.MAX_BARBER_SLEEP,"Barber sleep time");
+        addSliderLabels(controlPanel,10,50,280,20,Constants.MIN_BARBER_SLEEP,Constants.MAX_BARBER_SLEEP,"P2.Barber sleep time");
         barberSleepSlider.setBounds(10,70,280,20);
-        addSliderLabels(controlPanel,10,90,280,20,Constants.MIN_BARBER_WORK,Constants.MAX_BARBER_WORK,"Barber work time");
+        addSliderLabels(controlPanel,10,90,280,20,Constants.MIN_BARBER_WORK,Constants.MAX_BARBER_WORK,"P2.Barber work time");
         barberWorkSlider.setBounds(10,110,280,20);
         display.setBounds(10,150,280,240);
         controlPanel.setPreferredSize(new Dimension(300,400));
