@@ -10,7 +10,7 @@ public class Cpu {
     private LinkedList<Process> cpuQueue;
     private long maxCpuTime;
     private Statistics statistics;
-    private Process activeProcess;
+    private Process activeProcess = null;
     /**
      * Creates a new CPU with the given parameters.
      * @param cpuQueue		The CPU queue to be used.
@@ -34,7 +34,8 @@ public class Cpu {
      */
     public Event insertProcess(Process p, long clock) {
         cpuQueue.add(p);
-        if(getActiveProcess() == null){
+        p.joinedCPUQueue(clock);
+        if(isIdle()){
             return switchProcess(clock);
         }
         // Incomplete
@@ -50,8 +51,21 @@ public class Cpu {
      *				or null	if no process was activated.
      */
     public Event switchProcess(long clock) {
-        // Incomplete
-        return null;
+        // If there is no process running and no waiting processes, do nothing
+        if(cpuQueue.isEmpty() && isIdle()){
+            return null;
+        }
+        // If the queue is empty, don't swap process.
+        if(cpuQueue.isEmpty()){
+            return activeProcess.executeOnCpu(clock, maxCpuTime);
+        }
+        // Remove current process and add it to the CPU queue.
+        Process p = activeProcess;
+        activeProcess = cpuQueue.remove(0);
+        if( p != null){
+            insertProcess(p,clock);
+        }
+        return activeProcess.executeOnCpu(clock, maxCpuTime);
     }
 
     /**
@@ -61,8 +75,8 @@ public class Cpu {
      *			process was switched in.
      */
     public Event activeProcessLeft(long clock) {
-        // Incomplete
-        return null;
+        activeProcess = null;
+        return switchProcess(clock);
     }
 
     /**
@@ -70,8 +84,7 @@ public class Cpu {
      * @return	The process currently using the CPU.
      */
     public Process getActiveProcess() {
-        // Incomplete
-        return null;
+        return activeProcess;
     }
 
     /**
@@ -79,7 +92,16 @@ public class Cpu {
      * @param timePassed	The amount of time that has passed since the last call to this method.
      */
     public void timePassed(long timePassed) {
-        // Incomplete
+        statistics.cpuQueueLengthTime += cpuQueue.size() * timePassed;
+        if(cpuQueue.size() > statistics.cpuQueueLargestLength){
+            statistics.cpuQueueLargestLength = cpuQueue.size();
+        }
     }
+
+    private boolean isIdle(){
+        return activeProcess == null;
+    }
+
+
 
 }

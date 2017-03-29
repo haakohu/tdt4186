@@ -57,6 +57,8 @@ public class Process {
 		timeOfLastEvent = creationTime;
 		// Assign a process ID
 		processId = nextProcessId++;
+
+		timeToNextIoOperation = avgIoInterval;
 	}
 
 	/**
@@ -90,7 +92,7 @@ public class Process {
         statistics.totalTimeSpentInCpu += timeSpentInCpu;
         statistics.totalTimeSpentWaitingForIo += timeSpentWaitingForIo;
         statistics.totalTimeSpentInIo += timeSpentInIo;
-
+        statistics.totalBusyCpuTime += timeSpentInCpu;
         statistics.totalNofTimesInReadyQueue += nofTimesInReadyQueue;
         statistics.totalNofTimesInIoQueue += nofTimesInIoQueue;
 
@@ -102,4 +104,60 @@ public class Process {
 	}
 
 	// Add more methods as needed
+
+
+	public void joinedCPUQueue(long clock){
+        timeOfLastEvent = clock;
+        nofTimesInReadyQueue += 1;
+	}
+
+	public void joinedIOQueue(long clock){
+	    timeOfLastEvent = clock;
+	    nofTimesInIoQueue += 1;
+    }
+
+	public void leftCPUQueue(long clock){
+	    timeSpentInReadyQueue += clock - timeOfLastEvent;
+    }
+
+
+    public void leftIOQueue(long clock){
+        timeSpentWaitingForIo += clock - timeOfLastEvent;
+    }
+
+
+    public boolean requiresIO(){
+        return timeToNextIoOperation < cpuTimeNeeded;
+    }
+
+    public Event executeOnCpu(long clock, long maxCpuTime){
+        // If it requires IO
+        leftCPUQueue(clock);
+
+        // If the next operation is an IO request
+        if (requiresIO() && timeToNextIoOperation <= maxCpuTime){
+            long timeUsed = timeToNextIoOperation;
+            cpuTimeNeeded -= timeUsed;
+            timeSpentInCpu += timeUsed;
+            timeToNextIoOperation = (long) (Math.random() * avgIoInterval * 2);
+            return new Event(Event.IO_REQUEST, clock + timeUsed);
+        }
+        // If the process finish during this cycle
+        if( cpuTimeNeeded <= maxCpuTime){
+            timeSpentInCpu += cpuTimeNeeded;
+            return new Event(Event.END_PROCESS, clock + cpuTimeNeeded);
+        }
+        // The process will go until it switches.
+        timeSpentInCpu += maxCpuTime;
+        cpuTimeNeeded -= maxCpuTime;
+        timeToNextIoOperation -= maxCpuTime;
+        return new Event(Event.SWITCH_PROCESS, clock + maxCpuTime);
+
+    }
+
+    // Update the time used doing IO
+    public void updateUsedInIO(long time){
+        timeSpentInIo += time;
+    }
+
 }

@@ -8,6 +8,9 @@ import java.util.LinkedList;
  */
 public class Io {
     private Process activeProcess = null;
+    private LinkedList<Process> ioQueue;
+    private long avgIoTime;
+    private Statistics statistics;
 
     /**
      * Creates a new I/O device with the given parameters.
@@ -16,7 +19,9 @@ public class Io {
      * @param statistics	A reference to the statistics collector.
      */
     public Io(LinkedList<Process> ioQueue, long avgIoTime, Statistics statistics) {
-        // Incomplete
+        this.ioQueue = ioQueue;
+        this.avgIoTime = avgIoTime;
+        this.statistics = statistics;
     }
 
     /**
@@ -28,7 +33,11 @@ public class Io {
      *							if no operation was initiated.
      */
     public Event addIoRequest(Process requestingProcess, long clock) {
-        // Incomplete
+        ioQueue.add(requestingProcess);
+        requestingProcess.joinedIOQueue(clock);
+        if(isIdle()){
+            return startIoOperation(clock);
+        }
         return null;
     }
 
@@ -40,7 +49,13 @@ public class Io {
      *					or null	if no operation was initiated.
      */
     public Event startIoOperation(long clock) {
-        // Incomplete
+        if(!ioQueue.isEmpty()){
+            activeProcess = ioQueue.remove(0);
+            activeProcess.leftIOQueue(clock);
+            long ioTime = (long) (Math.random() * 2 *  avgIoTime);
+            activeProcess.updateUsedInIO(ioTime);
+            return new Event(Event.END_IO,clock+ ioTime);
+        }
         return null;
     }
 
@@ -49,7 +64,10 @@ public class Io {
      * @param timePassed	The amount of time that has passed since the last call to this method.
      */
     public void timePassed(long timePassed) {
-        // Incomplete
+        statistics.ioQueueLengthTime += ioQueue.size() * timePassed;
+        if(ioQueue.size() > statistics.ioQueueLargestLength){
+            statistics.ioQueueLargestLength = ioQueue.size();
+        }
     }
 
     /**
@@ -57,11 +75,16 @@ public class Io {
      * @return	The process that was doing I/O, or null if no process was doing I/O.
      */
     public Process removeActiveProcess() {
-        // Incomplete
-        return null;
+        Process p = activeProcess;
+        activeProcess = null;
+        return p;
     }
 
     public Process getActiveProcess() {
         return activeProcess;
+    }
+
+    public boolean isIdle(){
+        return activeProcess == null;
     }
 }

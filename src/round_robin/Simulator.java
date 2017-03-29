@@ -72,11 +72,13 @@ public class Simulator
 		eventQueue.insertEvent(new Event(Event.NEW_PROCESS, 0));
 		// Process events until the simulation length is exceeded:
 		while (clock < simulationLength && !eventQueue.isEmpty()) {
-			// Find the next event
+		    int n = eventQueue.history.size();
+            // Find the next event
 			Event event = eventQueue.getNextEvent();
-			// Find out how much time that passed...
+            // Find out how much time that passed...
 			long timeDifference = event.getTime()-clock;
-			// ...and update the clock.
+
+            // ...and update the clock.
 			clock = event.getTime();
 
 			/* Let the GUI know that time passed. */
@@ -154,20 +156,13 @@ public class Simulator
 		Process p = memory.checkMemory(clock);
 		// As long as there is enough memory, processes are moved from the memory queue to the cpu queue
 		while(p != null) {
-			
-			// TODO: Add this process to the CPU queue!
-			// Also add new events to the event queue if needed
+			// Add this process to the CPU queue
+            Event e = cpu.insertProcess(p,clock);
+            // Also add new events to the event queue if needed
+            eventQueue.insertEvent(e);
 
-			// Since we haven't implemented the CPU and I/O device yet,
-			// we let the process leave the system immediately, for now.
-			memory.processCompleted(p);
-			// Try to use the freed memory:
-			transferProcessFromMemToReady();
-			// Update statistics
-			p.updateStatistics(statistics);
-
-			// Check for more free memory
-			p =	 memory.checkMemory(clock);
+            // Check if there is more
+            p = memory.checkMemory(clock);
 		}
 	}
 
@@ -175,14 +170,23 @@ public class Simulator
 	 * Simulates a process switch.
 	 */
 	private void switchProcess() {
-		// Incomplete
+	    statistics.nofProcessSwitches ++;
+	    Event e = cpu.switchProcess(clock);
+	    eventQueue.insertEvent(e);
 	}
 
 	/**
 	 * Ends the active process, and deallocates any resources allocated to it.
 	 */
 	private void endProcess() {
-		// Incomplete
+	    Process p = cpu.getActiveProcess();
+	    memory.processCompleted(p);
+	    p.updateStatistics(statistics);
+	    Event e = cpu.activeProcessLeft(clock);
+	    eventQueue.insertEvent(e);
+	    // Check if there is space for more
+	    transferProcessFromMemToReady();
+	    // Update statistics
 	}
 
 	/**
@@ -190,7 +194,11 @@ public class Simulator
 	 * perform an I/O operation.
 	 */
 	private void processIoRequest() {
-		// Incomplete
+	    Process p = cpu.getActiveProcess();
+        Event e2 = io.addIoRequest(p,clock);
+	    Event e1 = cpu.activeProcessLeft(clock);
+	    eventQueue.insertEvent(e1);
+	    eventQueue.insertEvent(e2);
 	}
 
 	/**
@@ -198,7 +206,14 @@ public class Simulator
 	 * is done with its I/O operation.
 	 */
 	private void endIoOperation() {
-		// Incomplete
+	    Process p = io.removeActiveProcess();
+	    this.statistics.nofProcessedIoOperations++;
+	    // Check if there is another process in the IO queue
+        // Add the event back to the cpuQueue
+	    Event e1 = cpu.insertProcess(p,clock);
+	    eventQueue.insertEvent(e1);
+	    Event e = io.startIoOperation(clock);
+	    eventQueue.insertEvent(e);
 	}
 
 
@@ -229,7 +244,7 @@ public class Simulator
 	}
 
 	public void setOnTimeStep(Consumer<Long> onTimeStep) {
-		this.onTimeStep = onTimeStep;
+        this.onTimeStep = onTimeStep;
 	}
 
 	public void setOnEventHandled(Consumer<Long> onEventHandled) {

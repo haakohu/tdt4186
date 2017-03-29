@@ -14,7 +14,7 @@ public class Application {
         if (START_WITH_INPUT) {
             launchWithInput();
         } else {
-            launch(2048, 500, 225, 250000, 5000);
+            launch(2048, 500, 50, 250000, 5000);
         }
     }
 

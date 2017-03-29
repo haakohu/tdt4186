@@ -62,4 +62,8 @@ public class Event implements Comparable
 		Event e = (Event)o;
 		return (int)(time-e.time);
 	}
+
+	public String toString(){
+		return String.format("type: %d, time: %d",type,time);
+	}
 }
